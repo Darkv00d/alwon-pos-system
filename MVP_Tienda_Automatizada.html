@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVP — TIENDA AUTOMATIZADA EN CONJUNTO RESIDENCIAL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            color: #16a085;
+            margin-top: 20px;
+        }
+
+        h4 {
+            color: #27ae60;
+            margin-top: 15px;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #bdc3c7;
+            margin: 30px 0;
+        }
+
+        ul,
+        ol {
+            margin: 10px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 5px 0;
+        }
+
+        strong {
+            color: #2c3e50;
+        }
+
+        .check-mark {
+            color: #27ae60;
+        }
+
+        .cross-mark {
+            color: #e74c3c;
+        }
+
+        .icon {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>MVP — TIENDA AUTOMATIZADA EN CONJUNTO RESIDENCIAL</h1>
+    <h2>Documento Fundacional | Versión Mejorada</h2>
+
+    <hr>
+
+    <h2>PRINCIPIOS FUNDACIONALES DEL MVP</h2>
+
+    <h3>Objetivo del sistema</h3>
+    <p>Permitir que residentes de un conjunto accedan a una tienda sin cajero, donde el sistema detecta automáticamente
+        los productos tomados, genera un carrito y presenta la cuenta al momento de salida para pago en punto de venta
+        (POS) con operador.</p>
+
+    <h3>Principios operativos no negociables</h3>
+    <ol>
+        <li><strong>Sin bloqueo físico</strong>: El sistema nunca bloquea puertas ni impide la salida de personas.</li>
+        <li><strong>Presencia humana requerida</strong>: Debe haber un operador disponible en el POS durante horario de
+            operación.</li>
+        <li><strong>Pago al salir</strong>: El cobro se ejecuta únicamente al momento de salida, nunca de forma
+            automática o diferida.</li>
+        <li><strong>Integración, no reemplazo</strong>: El sistema se integra con infraestructura existente (video
+            portero), no la reemplaza.</li>
+        <li><strong>Un solo punto de acceso</strong>: El MVP opera con una sola puerta de entrada/salida monitoreada.
+        </li>
+    </ol>
+
+    <h3>Suposiciones operativas críticas</h3>
+    <ul>
+        <li>Existe conectividad estable dentro del conjunto residencial.</li>
+        <li>La tienda cuenta con cobertura visual completa de cámaras.</li>
+        <li>Los productos son visualmente distinguibles entre sí (o están etiquetados adecuadamente).</li>
+        <li>El horario de operación es definido y el operador está disponible en dicho horario.</li>
+    </ul>
+
+    <hr>
+
+    <h2>SECCIÓN 1: FLUJO DE LA PERSONA (EXPERIENCIA HUMANA)</h2>
+
+    <h3>Paso 1: Llegada y acceso</h3>
+    <ol>
+        <li>La persona se aproxima a la puerta de la tienda del conjunto.</li>
+        <li>El <strong>video portero del conjunto</strong> controla el acceso físico (puede ser infraestructura
+            preexistente o instalada).</li>
+        <li>La persona se identifica en el video portero:
+            <ul>
+                <li><strong>Si está registrada</strong>: el video portero permite el acceso automáticamente.</li>
+                <li><strong>Si no está registrada (No identificados)</strong>: <span class="highlight">el video portero
+                        captura el rostro pero no asigna nombre</span>. Solo puede acceder si una persona registrada
+                    autoriza explícitamente su ingreso.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h3>Paso 2: Dentro de la tienda</h3>
+    <ol start="4">
+        <li>Una vez cruzada la puerta, la persona entra a la tienda.</li>
+        <li>Puede haber otras personas dentro simultáneamente.</li>
+        <li>La persona <strong>no necesita interactuar con pantallas, apps ni dispositivos</strong>.</li>
+        <li>Toma productos directamente de los estantes.</li>
+        <li>Puede devolver productos a los estantes si cambia de opinión.</li>
+    </ol>
+
+    <h3>Paso 3: Salida y pago</h3>
+    <ol start="9">
+        <li>Cuando decide salir, la persona se dirige hacia la puerta de salida.</li>
+        <li>Al cruzar el umbral de salida, el sistema presenta automáticamente su carrito al POS.</li>
+        <li>El <strong>operador del POS</strong> ejecuta el cobro mediante billeteras digitales (Nequi, Llave, etc.) o
+            PSE.</li>
+        <li>Si hay discrepancia, el operador puede ajustar manualmente el carrito antes de cobrar.</li>
+        <li>Una vez pagado, la persona sale de la tienda.</li>
+    </ol>
+
+    <h3>Paso 4: Salida sin pago (edge case)</h3>
+    <ol start="14">
+        <li>Si la persona cruza la puerta de salida sin pagar:
+            <ul>
+                <li>El sistema <strong>no bloquea físicamente</strong> su salida.</li>
+                <li>El evento queda registrado como "salida sin pago" con evidencia de video.</li>
+                <li>Se notifica inmediatamente a la administración del conjunto.</li>
+                <li>Se categoriza como pérdida confirmada en inventario.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <hr>
+
+    <h2>SECCIÓN 2: PROCESO OPERATIVO DEL SISTEMA (QUÉ HACE EL SISTEMA)</h2>
+
+    <h3>Fase 1: Detección de acceso</h3>
+    <ol>
+        <li>El video portero autoriza el ingreso de una persona.</li>
+        <li>Nuestro sistema <strong>recibe el evento de acceso</strong> del video portero vía integración.</li>
+        <li>El sistema identifica la persona:
+            <ul>
+                <li><strong>Si está registrada</strong>: asocia su identidad al evento.</li>
+                <li><strong>Si es No identificados autorizado</strong>: <span class="highlight">el video portero captura
+                        el rostro sin asignar nombre. El sistema vincula el ingreso a la persona que autorizó y comienza
+                        a registrar evidencia fotográfica/video.</span></li>
+            </ul>
+        </li>
+        <li>El sistema crea automáticamente un <strong>carrito temporal único</strong> para esa sesión.</li>
+    </ol>
+
+    <h3>Fase 2: Observación y actualización de carrito</h3>
+    <ol start="5">
+        <li>Las cámaras detectan y reportan continuamente:
+            <ul>
+                <li>Posición de personas en la tienda.</li>
+                <li>Interacciones personas-objeto (tomar, devolver).</li>
+                <li>Estado de estantes (producto en reposo, ausente).</li>
+            </ul>
+        </li>
+        <li>El sistema asocia cada producto tomado a la persona correspondiente:
+            <ul>
+                <li><strong>En caso de ambigüedad</strong> (ej: dos personas cerca del mismo estante simultáneamente):
+                    <ul>
+                        <li>El sistema marca el evento como "requiere validación".</li>
+                        <li>Al momento de pago, el operador del POS revisa y ajusta manualmente si es necesario.</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li>El carrito se actualiza en tiempo real.</li>
+    </ol>
+
+    <h3>Fase 3: Cierre de sesión y pago</h3>
+    <ol start="8">
+        <li>El sistema detecta que la persona cruza el umbral de salida.</li>
+        <li>Presenta el carrito al POS inmediatamente.</li>
+        <li>El operador del POS:
+            <ul>
+                <li>Revisa el carrito presentado.</li>
+                <li>Ajusta manualmente si detecta errores evidentes.</li>
+                <li>Ejecuta el cobro.</li>
+            </ul>
+        </li>
+        <li>Una vez confirmado el pago, el sistema:
+            <ul>
+                <li>Cierra la sesión.</li>
+                <li>Actualiza inventarios (resta del inventario de stan y tienda).</li>
+                <li>Registra la transacción exitosa.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h3>Fase 4: Salida sin pago</h3>
+    <ol start="12">
+        <li>Si la persona cruza el umbral de salida y no se ejecuta pago en 30 segundos:
+            <ul>
+                <li>El sistema registra el evento como "pérdida confirmada".</li>
+                <li>Genera evidencia: video del ingreso, productos tomados, salida.</li>
+                <li>Envía notificación push/email a la administración del conjunto.</li>
+                <li>Actualiza inventario de pérdida.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <hr>
+
+    <h2>SECCIÓN 3: ENTREGABLES DEL MVP (REORDENADOS Y MEJORADOS)</h2>
+
+    <h3>📦 ENTREGABLE 1 — CONTROL DE ACCESO CON VIDEO PORTERO</h3>
+
+    <h4>Qué es</h4>
+    <p>El sistema requiere un video portero para controlar el acceso a la tienda y <strong>recibir eventos de acceso
+            autorizado</strong>. La solución contempla dos modalidades:</p>
+
+    <p><strong>Modalidad A — Integración con video portero existente</strong></p>
+    <ul>
+        <li>El conjunto ya cuenta con video portero instalado y operativo.</li>
+        <li>Nuestro sistema se integra mediante API o webhook.</li>
+        <li>El video portero continúa operando de forma completamente independiente.</li>
+    </ul>
+
+    <p><strong>Modalidad B — Provisión de video portero por parte de nuestra compañía</strong></p>
+    <ul>
+        <li>El conjunto no cuenta con video portero o desea actualizar el existente.</li>
+        <li>Nuestra compañía provee, instala y configura el video portero como parte de la solución integral.</li>
+        <li>El video portero provisto ya viene preconfigurado para integrarse con nuestro sistema.</li>
+    </ul>
+
+    <h4>Responsabilidad del video portero (independiente de la modalidad)</h4>
+    <ul>
+        <li>Capturar rostro de la persona.</li>
+        <li>Validar identidad según reglas del conjunto.</li>
+        <li>Decidir si abre o no la puerta.</li>
+        <li>Mantener su propia administración de usuarios.</li>
+    </ul>
+
+    <h4>Responsabilidad de nuestro sistema</h4>
+    <ul>
+        <li>Recibir eventos del video portero:
+            <ul>
+                <li>Persona identificada (con ID).</li>
+                <li>Acceso autorizado (timestamp).</li>
+            </ul>
+        </li>
+        <li>Consultar identidad en base de datos del conjunto.</li>
+        <li>Crear sesión de tienda.</li>
+        <li>Registrar accesos e ingresos No identificados.</li>
+        <li>Notificar ingresos No identificados a la persona que autorizó.</li>
+    </ul>
+
+    <h4>Criterios de aceptación</h4>
+    <ul>
+        <li><span class="check-mark">✅</span> <strong>Modalidad A</strong>: El sistema funciona con cualquier video
+            portero que soporte integración por API o webhook.</li>
+        <li><span class="check-mark">✅</span> <strong>Modalidad B</strong>: El video portero provisto está
+            preconfigurado y listo para usar tras instalación.</li>
+        <li><span class="check-mark">✅</span> En ambas modalidades, el video portero opera de forma independiente.</li>
+        <li><span class="check-mark">✅</span> El sistema <strong>nunca</strong> bloquea ni controla accesos.</li>
+        <li><span class="check-mark">✅</span> Todo ingreso autorizado genera una sesión de tienda automáticamente.</li>
+        <li><span class="check-mark">✅</span> Ingresos No identificados generan notificación inmediata a quien autorizó.
+        </li>
+    </ul>
+
+    <hr>
+
+    <h3>📦 ENTREGABLE 2 — CONFIGURACIÓN VISUAL DE ESTANTES Y PRODUCTOS</h3>
+
+    <h4>Qué es</h4>
+    <p>Interfaz administrativa para <strong>escanear el espacio físico, definir estantes virtuales y asociar productos a
+            cada estante</strong> antes de iniciar operación.</p>
+
+    <h4>Funcionalidades</h4>
+    <ul>
+        <li>Cargar vista de cámaras y definir visualmente:
+            <ul>
+                <li>Límites de cada estante (coordenadas/polígonos).</li>
+                <li>Zonas de interacción (frontal, lateral).</li>
+            </ul>
+        </li>
+        <li>Asociar uno o múltiples productos a cada estante.</li>
+        <li>Ajustar configuración cuando se reorganice la tienda física.</li>
+    </ul>
+
+    <h4>Criterios de aceptación</h4>
+    <ul>
+        <li><span class="check-mark">✅</span> Definición visual de cada stan (coordenadas o polígonos en la imagen).
+        </li>
+        <li><span class="check-mark">✅</span> Ajuste dinámico de límites virtuales sin reconfigurar cámaras.</li>
+        <li><span class="check-mark">✅</span> Asociación múltiple de productos por stan (varios SKUs en mismo estante).
+        </li>
+    </ul>
+
+    <p><strong>NOTA CRÍTICA</strong>: Este entregable es <strong>pre-requisito</strong> para la observación por cámaras.
+        Sin estantes configurados, el sistema no puede operar.</p>
+
+    <hr>
+
+    <h3>📦 ENTREGABLE 3 — OBSERVACIÓN POR CÁMARAS E IA</h3>
+
+    <h4>Qué es</h4>
+    <p>El sistema observa continuamente la tienda mediante cámaras e IA para <strong>detectar personas, objetos y
+            eventos de toma/devolución</strong>.</p>
+
+    <h4>Responsabilidad de la IA</h4>
+    <ul>
+        <li>Detectar personas (seguimiento multi-persona).</li>
+        <li>Detectar objetos (productos en mano, en reposo).</li>
+        <li>Detectar eventos:
+            <ul>
+                <li>Persona toma producto de estante.</li>
+                <li>Persona devuelve producto a estante.</li>
+                <li>Productos en reposo (sin interacción).</li>
+            </ul>
+        </li>
+        <li><strong>Reportar</strong>, no decidir. La IA nunca ejecuta pagos ni modifica inventarios directamente.</li>
+    </ul>
+
+    <h4>Política de ambigüedad</h4>
+    <ul>
+        <li>Si la IA <strong>no puede asociar con certeza</strong> un producto a una persona:
+            <ul>
+                <li>Marca el evento como "requiere validación".</li>
+                <li>Al momento de pago, el operador del POS revisa manualmente.</li>
+                <li>El operador tiene autoridad final para ajustar el carrito.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h4>Criterios de aceptación</h4>
+    <ul>
+        <li><span class="check-mark">✅</span> Detección continua de personas, objetos y estantes.</li>
+        <li><span class="check-mark">✅</span> Asociación correcta persona-objeto en escenarios simples (una persona,
+            toma clara).</li>
+        <li><span class="check-mark">✅</span> Estados correctos: reposo / tomado / devuelto.</li>
+        <li><span class="check-mark">✅</span> Marca como "requiere validación" cuando hay ambigüedad.</li>
+    </ul>
+
+    <hr>
+
+    <h3>📦 ENTREGABLE 4 — SESIONES Y CARRITOS TEMPORALES</h3>
+
+    <h4>Qué es</h4>
+    <p>Cada persona que ingresa a la tienda genera automáticamente un <strong>carrito temporal, único e
+            identificado</strong>, visible en tiempo real desde el POS.</p>
+
+    <h4>Reglas de gestión de carritos</h4>
+    <ul>
+        <li><strong>Un carrito por persona</strong> simultáneamente.</li>
+        <li><strong>Múltiples carritos activos</strong> (varias personas en tienda al mismo tiempo).</li>
+        <li><strong>Actualización en tiempo real</strong> (cada evento de toma/devolución refleja inmediatamente).</li>
+        <li><strong>Cierre de carrito</strong> solo al salir y pagar.</li>
+    </ul>
+
+    <h4>Gestión de carritos No identificados</h4>
+    <ul>
+        <li>Si entra un No identificados autorizado por persona X:
+            <ul>
+                <li>El No identificados tiene su propio carrito independiente.</li>
+                <li><span class="highlight"><strong>El sistema guarda evidencia adicional</strong>: foto del rostro
+                        capturada por el video portero y videos cortos de cada producto que toma.</span></li>
+                <li>Al momento de pago, si el No identificados no paga:
+                    <ul>
+                        <li>Se notifica a la persona X (quien autorizó).</li>
+                        <li>La responsabilidad recae en X según política del conjunto.</li>
+                        <li><span class="highlight">Se entrega evidencia completa: rostro + videos de productos
+                                tomados.</span></li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+    <h4>Criterios de aceptación</h4>
+    <ul>
+        <li><span class="check-mark">✅</span> Un carrito único por persona identificada.</li>
+        <li><span class="check-mark">✅</span> Múltiples carritos simultáneos sin interferencia.</li>
+        <li><span class="check-mark">✅</span> Actualización en tiempo real (latencia &lt; 2 segundos).</li>
+        <li><span class="check-mark">✅</span> Carritos No identificados vinculados a quien autorizó el ingreso.</li>
+        <li><span class="check-mark">✅</span> Cierre de carrito solo al ejecutar pago o registrar salida sin pago.</li>
+    </ul>
+
+    <hr>
+
+    <h3>📦 ENTREGABLE 5 — INVENTARIOS MULTINIVEL</h3>
+
+    <h4>Qué es</h4>
+    <p>Sistema de inventarios con <strong>cuatro niveles independientes pero conectados</strong>: stan, tienda, bodega y
+        pérdida.</p>
+
+    <h4>Estructura de inventarios</h4>
+    <ol>
+        <li><strong>Inventario de stan</strong>: Producto asignado físicamente a cada estante.</li>
+        <li><strong>Inventario de tienda</strong>: Total de productos disponibles en la tienda (suma de stans).</li>
+        <li><strong>Inventario de bodega</strong>: Productos en almacén, pendientes de reponer en tienda.</li>
+        <li><strong>Inventario de pérdida</strong>: Productos registrados como perdidos, con categorización.</li>
+    </ol>
+
+    <h4>Categorías de pérdida</h4>
+    <ul>
+        <li><strong>Pérdida confirmada</strong>: Salida sin pago con evidencia.</li>
+        <li><strong>Pérdida operativa</strong>: Errores de IA, productos rotos/dañados.</li>
+        <li><strong>Pérdida administrativa</strong>: Vencimientos, descuentos, donaciones.</li>
+    </ul>
+
+    <h4>Criterios de aceptación</h4>
+    <ul>
+        <li><span class="check-mark">✅</span> Separación clara de los 4 niveles de inventario.</li>
+        <li><span class="check-mark">✅</span> Tolerancia a inconsistencias temporales (ej: producto tomado pero aún no
+            pagado).</li>
+        <li><span class="check-mark">✅</span> Registro automático de pérdida con categorización.</li>
+        <li><span class="check-mark">✅</span> Notificación cuando inventario de stan &lt; umbral definido (reposición
+            necesaria).</li>
+    </ul>
+
+    <hr>
+
+    <h3>📦 ENTREGABLE 6 — POS Y EJECUCIÓN DE PAGOS</h3>
+
+    <h4>Qué es</h4>
+    <p>El <strong>punto de venta (POS)</strong> es la interfaz del operador humano donde se visualizan carritos activos,
+        se ejecutan pagos y se ajustan manualmente si es necesario.</p>
+
+    <h4>Funcionalidades del POS</h4>
+    <ul>
+        <li>Visualizar todos los carritos activos en tiempo real.</li>
+        <li>Recibir automáticamente el carrito cuando una persona cruza el umbral de salida.</li>
+        <li>Permitir ajuste manual del carrito por parte del operador (agregar/quitar productos).</li>
+        <li>Ejecutar el cobro mediante billeteras digitales (Nequi, Llave, Daviplata, etc.) o PSE.</li>
+        <li>Registrar el pago y cerrar sesión.</li>
+    </ul>
+
+    <h4>Política de pago</h4>
+    <ul>
+        <li><strong>Pago únicamente al salir</strong>, nunca automático ni diferido.</li>
+        <li><strong>Métodos de pago aceptados en el MVP</strong>:
+            <ul>
+                <li>Billeteras digitales (Nequi, Llave, Daviplata, etc.)</li>
+                <li>PSE (Pagos Seguros en Línea)</li>
+            </ul>
+        </li>
+        <li><strong>NO se acepta efectivo ni tarjetas físicas</strong> en el MVP.</li>
+        <li>El operador puede rechazar el cobro si detecta error evidente y ajustar el carrito.</li>
+    </ul>
+
+    <h4>Criterios de aceptación</h4>
+    <ul>
+        <li><span class="check-mark">✅</span> POS visualiza todos los carritos activos con nombres/IDs.</li>
+        <li><span class="check-mark">✅</span> Carrito se presenta automáticamente al POS cuando persona sale.</li>
+        <li><span class="check-mark">✅</span> Operador puede ajustar carrito manualmente antes de cobrar.</li>
+        <li><span class="check-mark">✅</span> Pago cierra sesión y actualiza inventarios.</li>
+        <li><span class="check-mark">✅</span> Integración con billeteras digitales (Nequi, Llave, Daviplata) y PSE.</li>
+        <li><span class="check-mark">✅</span> Sin cargos automáticos ni pagos diferidos.</li>
+    </ul>
+
+    <hr>
+
+    <h3>📦 ENTREGABLE 7 — AUDITORÍA Y EVIDENCIAS</h3>
+
+    <h4>Qué es</h4>
+    <p>Sistema de <strong>registro completo de eventos, generación de evidencia en video y notificaciones</strong> sin
+        bloqueo físico.</p>
+
+    <h4>Funcionalidades</h4>
+    <ul>
+        <li>Registrar todos los eventos:
+            <ul>
+                <li>Accesos (registrados y No identificados).</li>
+                <li>Productos tomados/devueltos.</li>
+                <li>Pagos ejecutados.</li>
+                <li>Salidas sin pago.</li>
+            </ul>
+        </li>
+        <li>Generar evidencia automática:
+            <ul>
+                <li>Clips de video de cada sesión.</li>
+                <li><span class="highlight"><strong>Para personas No identificadas</strong>: foto del rostro capturada
+                        en el acceso + videos cortos de cada producto tomado.</span></li>
+                <li>Video específico de salidas sin pago (30 segundos antes/después).</li>
+            </ul>
+        </li>
+        <li>Enviar notificaciones:
+            <ul>
+                <li>A la administración del conjunto (salidas sin pago, pérdidas).</li>
+                <li>A quien autorizó ingresos No identificados (si el No identificados no paga, con evidencia: rostro +
+                    videos de productos).</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h4>Criterios de aceptación</h4>
+    <ul>
+        <li><span class="check-mark">✅</span> Logs completos de todos los eventos con timestamp.</li>
+        <li><span class="check-mark">✅</span> Evidencia en video automática para cada sesión.</li>
+        <li><span class="check-mark">✅</span> Clips específicos de salidas sin pago listos para envío.</li>
+        <li><span class="check-mark">✅</span> Notificaciones automáticas a administración vía email/push.</li>
+    </ul>
+
+    <hr>
+
+    <h3>📦 ENTREGABLE 8 — DASHBOARD ADMINISTRATIVO</h3>
+
+    <h4>Qué es</h4>
+    <p>Panel de control centralizado para <strong>visualizar operación en tiempo real y consultar históricos</strong>.
+    </p>
+
+    <h4>Funcionalidades</h4>
+    <ul>
+        <li>Ver todas las sesiones activas (quién está dentro, qué productos tienen).</li>
+        <li>Consultar registros históricos:
+            <ul>
+                <li>Accesos por día/semana/mes.</li>
+                <li>Ventas por producto.</li>
+                <li>Pérdidas categorizadas.</li>
+            </ul>
+        </li>
+        <li>Ver inventarios actuales (stan, tienda, bodega, pérdida).</li>
+        <li>Acceder a evidencias de video.</li>
+        <li>Configurar notificaciones y umbrales.</li>
+    </ul>
+
+    <h4>Criterios de aceptación</h4>
+    <ul>
+        <li><span class="check-mark">✅</span> Visualización de sesiones activas en tiempo real.</li>
+        <li><span class="check-mark">✅</span> Consulta de históricos con filtros por fecha/producto/persona.</li>
+        <li><span class="check-mark">✅</span> Visualización de inventarios multinivel.</li>
+        <li><span class="check-mark">✅</span> Acceso directo a evidencias de video desde el dashboard.</li>
+    </ul>
+
+    <hr>
+
+    <h3>📦 ENTREGABLE 9 — DETECCIÓN DE SALIDA Y CIERRE AUTOMÁTICO DE SESIÓN</h3>
+
+    <h4>Qué es</h4>
+    <p>Lógica operativa para <strong>detectar cuándo una persona cruza el umbral de salida</strong>, presentar su
+        carrito al POS y cerrar sesión.</p>
+
+    <h4>Criterios de detección</h4>
+    <ul>
+        <li>La persona cruza el <strong>umbral de salida monitoreado</strong> (línea virtual definida en configuración).
+        </li>
+        <li>El sistema espera <strong>30 segundos</strong> desde que detecta cruce de umbral:
+            <ul>
+                <li>Si se ejecuta pago: cierra sesión exitosa.</li>
+                <li>Si NO se ejecuta pago: registra como salida sin pago.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h4>Criterios de aceptación</h4>
+    <ul>
+        <li><span class="check-mark">✅</span> Detección precisa de cruce de umbral de salida.</li>
+        <li><span class="check-mark">✅</span> Presentación automática del carrito al POS al detectar salida.</li>
+        <li><span class="check-mark">✅</span> Espera de 30 segundos antes de registrar como pérdida.</li>
+        <li><span class="check-mark">✅</span> Cierre automático de sesión tras pago o expiración de tiempo.</li>
+    </ul>
+
+    <hr>
+
+    <h3>📦 ENTREGABLE 10 — ROADMAP DE EVOLUCIÓN (FUERA DEL MVP)</h3>
+
+    <h4>Qué es</h4>
+    <p>Documento que define <strong>funcionalidades futuras NO incluidas en el MVP</strong>, para prevenir scope creep y
+        alinear expectativas con stakeholders.</p>
+
+    <h4>Funcionalidades roadmap (post-MVP)</h4>
+    <ul>
+        <li>Apps móviles para residentes.</li>
+        <li><strong>Tarjeta recargable de la tienda para niños</strong> (sin acceso a billeteras digitales).</li>
+        <li>Cargos automáticos y débito diferido.</li>
+        <li>Ingreso de inventario automatizado por IA (detección de reposición).</li>
+        <li>Multi-tienda operativa (varias tiendas en diferentes conjuntos).</li>
+        <li>Análisis predictivo de demanda.</li>
+        <li>Integración con sistemas de contabilidad del conjunto.</li>
+    </ul>
+
+    <h4>Criterio de aceptación</h4>
+    <ul>
+        <li><span class="check-mark">✅</span> Documento claro que separa MVP vs. roadmap.</li>
+        <li><span class="check-mark">✅</span> Cada funcionalidad roadmap tiene justificación de por qué NO está en MVP.
+        </li>
+    </ul>
+
+    <hr>
+
+    <h2>SECCIÓN 4: EXCLUSIONES EXPLÍCITAS DEL MVP</h2>
+
+    <p>Las siguientes funcionalidades <strong>NO están incluidas en el MVP</strong> y no deben ser desarrolladas en esta
+        fase:</p>
+
+    <ul>
+        <li><span class="cross-mark">❌</span> <strong>Autonomía total sin operador humano</strong>: Siempre debe haber
+            un operador disponible.</li>
+        <li><span class="cross-mark">❌</span> <strong>Bloqueo físico de puertas</strong>: El sistema nunca impide la
+            salida física.</li>
+        <li><span class="cross-mark">❌</span> <strong>Apps móviles para clientes/residentes</strong>: No hay aplicación
+            móvil en MVP.</li>
+        <li><span class="cross-mark">❌</span> <strong>Cargos automáticos o débito diferido</strong>: Todo pago es manual
+            en POS al momento de salida.</li>
+        <li><span class="cross-mark">❌</span> <strong>Tarjeta recargable de la tienda</strong>: Esta funcionalidad está
+            en el roadmap post-MVP.</li>
+        <li><span class="cross-mark">❌</span> <strong>Aceptación de efectivo o tarjetas físicas</strong>: Solo
+            billeteras digitales y PSE.</li>
+        <li><span class="cross-mark">❌</span> <strong>Ingreso de inventario por IA</strong>: La reposición es manual.
+        </li>
+        <li><span class="cross-mark">❌</span> <strong>Multi-tienda operativa</strong>: El MVP opera en una sola tienda.
+        </li>
+        <li><span class="cross-mark">❌</span> <strong>Retail abierto al público</strong>: Solo para residentes del
+            conjunto.</li>
+        <li><span class="cross-mark">❌</span> <strong>Soporte multi-puerta</strong>: Solo una puerta de entrada/salida.
+        </li>
+        <li><span class="cross-mark">❌</span> <strong>Operación offline</strong>: Requiere conectividad estable.</li>
+    </ul>
+
+    <hr>
+
+    <h2>ESTADO FINAL DEL MVP</h2>
+
+    <ul>
+        <li><span class="check-mark">✔</span> <strong>Alcance claro y conservador</strong></li>
+        <li><span class="check-mark">✔</span> <strong>Límites explícitos y defendibles</strong></li>
+        <li><span class="check-mark">✔</span> <strong>Separación estricta entre flujo humano y proceso del
+                sistema</strong></li>
+        <li><span class="check-mark">✔</span> <strong>Integración realista con infraestructura de conjuntos</strong>
+        </li>
+        <li><span class="check-mark">✔</span> <strong>Política de ambigüedad definida (operador tiene autoridad
+                final)</strong></li>
+        <li><span class="check-mark">✔</span> <strong>Entregables reordenados lógicamente (dependencias claras)</strong>
+        </li>
+        <li><span class="check-mark">✔</span> <strong>Criterios de aceptación precisos y verificables</strong></li>
+        <li><span class="check-mark">✔</span> <strong>Listo para convertirse en backlog, arquitectura técnica o
+                documento de inversionistas</strong></li>
+    </ul>
+
+    <hr>
+
+    <p><strong>Versión</strong>: 2.2 — Actualizada (Pagos Digitales + Evidencia No identificados)<br>
+        <strong>Fecha</strong>: Diciembre 2025<br>
+        <strong>Propósito</strong>: Documento fundacional operativo del MVP
+    </p>
+
+</body>
+
+</html>
