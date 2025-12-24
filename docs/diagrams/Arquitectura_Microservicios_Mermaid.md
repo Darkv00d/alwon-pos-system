@@ -8,27 +8,33 @@ Este diagrama muestra la arquitectura real del sistema Alwon POS tal como está 
 graph TB
     %% Estilos
     classDef external fill:#E8DAEF,stroke:#9673a6,stroke-width:3px,color:#000
+    classDef externalAPI fill:#FFE6E6,stroke:#FF6B6B,stroke-width:4px,color:#000
     classDef frontend fill:#D5F4E6,stroke:#82b366,stroke-width:3px,color:#000
     classDef gateway fill:#D6EAF8,stroke:#6c8ebf,stroke-width:3px,color:#000
     classDef microservice fill:#FCF3CF,stroke:#d79b00,stroke-width:3px,color:#000
     classDef database fill:#FADBD8,stroke:#c73232,stroke-width:3px,color:#000
     classDef broker fill:#F5EEF8,stroke:#af7ac5,stroke-width:3px,color:#000
     
-    %% Sistemas Externos
-    THIRD["🤖 Sistemas Terceros<br/>IA/Cámaras"]:::external
+    %% SISTEMA EXTERNO - CONCENTRADOR
+    CONCENTRADOR["🤖 SISTEMA CONCENTRADOR<br/>(IA + Cámaras)<br/><br/>• Reconocimiento facial<br/>• Detección de productos<br/>• Tracking de movimientos"]:::external
     
-    %% FRONTEND
-    subgraph CAPA1["💻 FRONTEND"]
+    %% CAPA 0: API EXTERNA
+    subgraph CAPA0["🌐 CAPA 0: API EXTERNA (Solo para Concentrador)"]
+        EXTAPI["External API Service<br/>:9000<br/><br/>🔴 POST /api/external/customer<br/>🔴 POST /api/external/purchase<br/><br/>⚠️ PENDIENTE DE IMPLEMENTAR"]:::externalAPI
+    end
+    
+    %% CAPA 1: FRONTEND
+    subgraph CAPA1["💻 CAPA 1: FRONTEND"]
         PWA["React PWA<br/>TypeScript + Vite<br/>:3000<br/><br/>• Dashboard<br/>• Cart View<br/>• Payment Flow"]:::frontend
     end
     
-    %% GATEWAY
-    subgraph CAPA2["🚪 GATEWAY"]
-        GW["API Gateway<br/>Spring Cloud Gateway<br/>:8080<br/><br/>Rutas:<br/>/api/sessions/*<br/>/api/carts/*<br/>/api/products/*<br/>/api/payments/*<br/>/api/access/*<br/>/api/camera/*"]:::gateway
+    %% CAPA 2: GATEWAY
+    subgraph CAPA2["🚪 CAPA 2: GATEWAY"]
+        GW["API Gateway<br/>Spring Cloud Gateway<br/>:8080<br/><br/>Rutas para Frontend:<br/>/api/sessions/*<br/>/api/carts/*<br/>/api/products/*<br/>/api/payments/*"]:::gateway
     end
     
-    %% MICROSERVICIOS
-    subgraph CAPA3["⚙️ MICROSERVICIOS IMPLEMENTADOS"]
+    %% CAPA 3: MICROSERVICIOS INTERNOS
+    subgraph CAPA3["⚙️ CAPA 3: MICROSERVICIOS INTERNOS"]
         SESSION["Session Service<br/>:8081<br/><br/>• Gestión de sesiones<br/>• Customer sessions<br/>• Active/Suspended/Closed"]:::microservice
         
         CART["Cart Service<br/>:8082<br/><br/>• Shopping carts<br/>• Cart items<br/>• Totals calculation"]:::microservice
@@ -39,57 +45,74 @@ graph TB
         
         ACCESS["Access Service<br/>:8085<br/><br/>• Client types<br/>• Access control<br/>• Intercoms"]:::microservice
         
-        CAMERA["Camera Service<br/>:8086<br/><br/>• Facial recognition<br/>• Visual evidence<br/>• Media storage"]:::microservice
-        
         INVENTORY["Inventory Service<br/>:8087<br/><br/>• Stock management<br/>• Alerts<br/>• Movements"]:::microservice
         
         WS["WebSocket Server<br/>:8090<br/><br/>• Real-time updates<br/>• Cart sync<br/>• Event notifications"]:::microservice
     end
     
-    %% PERSISTENCIA
-    subgraph CAPA4["💾 PERSISTENCIA"]
-        POSTGRES[("PostgreSQL<br/>:5432<br/><br/>Schemas:<br/>• sessions<br/>• carts<br/>• products<br/>• payments<br/>• access<br/>• camera<br/>• inventory")]:::database
+    %% CAPA 4: PERSISTENCIA
+    subgraph CAPA4["💾 CAPA 4: PERSISTENCIA"]
+        POSTGRES[("PostgreSQL<br/>:5432<br/><br/>Schemas:<br/>• sessions<br/>• carts<br/>• products<br/>• payments<br/>• access<br/>• inventory")]:::database
         
         RABBIT["RabbitMQ<br/>:5672 / :15672<br/><br/>Exchanges:<br/>• alwon.events<br/><br/>Queues:<br/>• cart.updated<br/>• session.events<br/>• payment.events"]:::broker
     end
     
-    %% CONEXIONES - Externas
-    THIRD -.->|"HTTP POST<br/>/customer<br/>/purchase"| CAMERA
+    %% ========================================
+    %% CONEXIONES EXTERNAS (Concentrador → API Externa)
+    %% ========================================
+    CONCENTRADOR ==>|"HTTP POST<br/><br/>Cliente identificado<br/>+ Productos tomados"| EXTAPI
     
-    %% CONEXIONES - Frontend
+    %% ========================================
+    %% CONEXIONES API EXTERNA → MICROSERVICIOS
+    %% ========================================
+    EXTAPI -->|"1. Crear/actualizar sesión"| SESSION
+    EXTAPI -->|"2. Consultar precios"| PRODUCT
+    EXTAPI -->|"3. Añadir items al carrito"| CART
+    
+    %% ========================================
+    %% CONEXIONES FRONTEND
+    %% ========================================
     PWA -->|"REST API"| GW
     PWA -.->|"WebSocket<br/>ws://8090/ws"| WS
     
-    %% CONEXIONES - Gateway → Microservicios
+    %% ========================================
+    %% CONEXIONES GATEWAY → MICROSERVICIOS
+    %% ========================================
     GW -->|"/api/sessions/*"| SESSION
     GW -->|"/api/carts/*"| CART
     GW -->|"/api/products/*"| PRODUCT
     GW -->|"/api/payments/*"| PAYMENT
     GW -->|"/api/access/*"| ACCESS
-    GW -->|"/api/camera/*"| CAMERA
     
-    %% CONEXIONES - WebSocket
+    %% ========================================
+    %% CONEXIONES WEBSOCKET
+    %% ========================================
     WS -.->|"Real-time events"| SESSION
     WS -.->|"Cart updates"| CART
     WS -.->|"Payment status"| PAYMENT
     
-    %% CONEXIONES - Microservicios entre sí
+    %% ========================================
+    %% COMUNICACIÓN ENTRE MICROSERVICIOS
+    %% ========================================
     CART -->|"Get session info"| SESSION
     CART -->|"Get product details"| PRODUCT
     PAYMENT -->|"Get cart total"| CART
     PAYMENT -->|"Get session data"| SESSION
     INVENTORY -->|"Update stock"| PRODUCT
     
-    %% CONEXIONES - Microservicios → Base de Datos
+    %% ========================================
+    %% CONEXIONES A BASE DE DATOS
+    %% ========================================
     SESSION -->|"sessions schema"| POSTGRES
     CART -->|"carts schema"| POSTGRES
     PRODUCT -->|"products schema"| POSTGRES
     PAYMENT -->|"payments schema"| POSTGRES
     ACCESS -->|"access schema"| POSTGRES
-    CAMERA -->|"camera schema"| POSTGRES
     INVENTORY -->|"inventory schema"| POSTGRES
     
-    %% CONEXIONES - Event Bus
+    %% ========================================
+    %% EVENT BUS (RabbitMQ)
+    %% ========================================
     SESSION -.->|"Publish events"| RABBIT
     CART -.->|"Publish CART_UPDATED"| RABBIT
     PAYMENT -.->|"Publish PAYMENT_COMPLETED"| RABBIT
@@ -97,18 +120,18 @@ graph TB
     RABBIT -.->|"Consume events"| WS
     RABBIT -.->|"Consume events"| INVENTORY
     
+    %% ========================================
     %% LEYENDA
+    %% ========================================
     subgraph LEYENDA["📋 LEYENDA"]
-        L1["Sistemas Externos"]:::external
+        L0["API Externa (Concentrador)"]:::externalAPI
+        L1["Sistema Externo"]:::external
         L2["Frontend React PWA"]:::frontend
         L3["API Gateway"]:::gateway
-        L4["Microservicios"]:::microservice
+        L4["Microservicios Internos"]:::microservice
         L5["Base de Datos"]:::database
         L6["Message Broker"]:::broker
     end
-    
-    %% NOTAS
-    NOTE1["⚠️ SERVICIOS PENDIENTES:<br/>• Auth Service (Autenticación operadores)<br/>• Notification Service<br/>• Analytics Service"]
 ```
 
 ---
