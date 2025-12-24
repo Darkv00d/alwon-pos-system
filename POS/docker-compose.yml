@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: alwon-postgres
+    environment:
+      POSTGRES_DB: alwon_pos
+      POSTGRES_USER: alwon
+      POSTGRES_PASSWORD: alwon2024
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U alwon" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - alwon-network
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: alwon-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: alwon
+      RABBITMQ_DEFAULT_PASS: alwon2024
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - alwon-network
+
+  # 1. Session Service
+  session-service:
+    build: ./backend/session-service
+    container_name: alwon-session
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/alwon_pos
+      - SPRING_DATASOURCE_USERNAME=alwon
+      - SPRING_DATASOURCE_PASSWORD=alwon2024
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - alwon-network
+
+  # 2. Product Service
+  product-service:
+    build: ./backend/product-service
+    container_name: alwon-product
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/alwon_pos
+      - SPRING_DATASOURCE_USERNAME=alwon
+      - SPRING_DATASOURCE_PASSWORD=alwon2024
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - alwon-network
+
+  # 3. Cart Service  
+  cart-service:
+    build: ./backend/cart-service
+    container_name: alwon-cart
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/alwon_pos
+      - SPRING_DATASOURCE_USERNAME=alwon
+      - SPRING_DATASOURCE_PASSWORD=alwon2024
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - alwon-network
+
+  # 4. API Gateway
+  api-gateway:
+    build: ./backend/api-gateway
+    container_name: alwon-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SESSION_SERVICE_URL=http://session-service:8081
+      - PRODUCT_SERVICE_URL=http://product-service:8083
+      - CART_SERVICE_URL=http://cart-service:8082
+    depends_on:
+      - session-service
+      - product-service
+      - cart-service
+    networks:
+      - alwon-network
+
+volumes:
+  postgres_data:
+
+
+networks:
+  alwon-network:
+    driver: bridge
