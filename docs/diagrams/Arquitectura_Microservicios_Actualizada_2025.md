@@ -1,6 +1,6 @@
 # Arquitectura de Microservicios - Alwon POS
 
-## Versión Actual Implementada (Diciembre 2024)
+## Versión Actual Implementada (Diciembre 2025)
 
 Este diagrama muestra la arquitectura real del sistema Alwon POS tal como está implementada actualmente.
 
