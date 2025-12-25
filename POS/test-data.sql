@@ -28,7 +28,7 @@ VALUES
 INSERT INTO sessions.customer_sessions 
 (session_id, customer_id, customer_type, customer_name, tower, apartment, phone, email, photo_url, status, created_at, updated_at, expires_at, last_activity_at)
 VALUES
-('session-003', NULL, 'NO_ID', 'Cliente No Identificado', NULL, NULL, NULL, NULL, NULL, 'ACTIVE', NOW() - INTERVAL '5 minutes', NOW(), NOW() + INTERVAL '25 minutes', NOW());
+('session-003', NULL, 'NO_ID', 'Cliente No Identificado', NULL, NULL, NULL, NULL, 'https://randomuser.me/api/portraits/men/32.jpg', 'ACTIVE', NOW() - INTERVAL '5 minutes', NOW(), NOW() + INTERVAL '25 minutes', NOW());
 
 -- Sesión 4: Cliente con reconocimiento facial (AT_CHECKOUT - en caja)
 INSERT INTO sessions.customer_sessions 
