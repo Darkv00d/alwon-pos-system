@@ -1,197 +1,180 @@
 # Arquitectura de Microservicios - Alwon POS
-## Versión con API Externa para Sistemas Terceros
 
-Este diagrama muestra la arquitectura completa del sistema Alwon POS, incluyendo la nueva capa de API Externa que permite recibir información de clientes y compras desde sistemas de terceros (IA/Cámaras).
+## Versión Actualizada (25 Diciembre 2025)
+
+Sistema Alwon POS con separación clara de integraciones entrantes y salientes.
 
 ```mermaid
 graph TB
     %% Estilos
-    classDef external fill:#000,stroke:#9673a6,stroke-width:2px,color:#fff
-    classDef frontend fill:#000,stroke:#82b366,stroke-width:2px,color:#fff
-    classDef gateway fill:#000,stroke:#6c8ebf,stroke-width:2px,color:#fff
-    classDef microservice fill:#000,stroke:#d79b00,stroke-width:2px,color:#fff
-    classDef database fill:#000,stroke:#d6b656,stroke-width:2px,color:#fff
-    classDef cache fill:#000,stroke:#c73232,stroke-width:2px,color:#fff
+    classDef incoming fill:#FFE6E6,stroke:#FF6B6B,stroke-width:4px,color:#000
+    classDef outgoing fill:#E8DAEF,stroke:#9673a6,stroke-width:3px,color:#000
+    classDef frontend fill:#D5F4E6,stroke:#82b366,stroke-width:3px,color:#000
+    classDef gateway fill:#D6EAF8,stroke:#6c8ebf,stroke-width:3px,color:#000
+    classDef microservice fill:#FCF3CF,stroke:#d79b00,stroke-width:3px,color:#000
+    classDef auth fill:#D4EDDA,stroke:#28a745,stroke-width:3px,color:#000
+    classDef database fill:#FADBD8,stroke:#c73232,stroke-width:3px,color:#000
+    classDef broker fill:#F5EEF8,stroke:#af7ac5,stroke-width:3px,color:#000
+    classDef redis fill:#FFE6CC,stroke:#FF6B35,stroke-width:3px,color:#000
     
-    %% Sistemas Externos (fuera de capas)
-    THIRD["Sistemas Terceros#10;IA/Cámaras"]:::external
-    
-    %% CAPA 0: API EXTERNA
-    subgraph CAPA0["🌐 CAPA 0: API EXTERNA"]
-        EXT["External Customer API#10;Spring Boot :9000#10;#10;POST /api/external/customer#10;POST /api/external/purchase"]:::external
+    %% CAPA 0: INTEGRACIONES ENTRANTES
+    subgraph CAPA0["📥 CAPA 0: INTEGRACIONES ENTRANTES"]
+        CONCENTRADOR["Concentrador IA<br/>(Reconocimiento + Tracking)"]:::outgoing
+        EXTAPI["External API :9000<br/><br/>POST /external/customer<br/>POST /external/purchase"]:::incoming
     end
     
     %% CAPA 1: FRONTEND
     subgraph CAPA1["💻 CAPA 1: FRONTEND"]
-        PWA["React PWA#10;TypeScript + Vite#10;:5173"]:::frontend
+        PWA["React PWA :3000<br/><br/>• Dashboard<br/>• Cart View<br/>• Payment<br/>• Auth ✨"]:::frontend
     end
     
-    %% CAPA 2: GATEWAY & WEBSOCKET
-    subgraph CAPA2["🚪 CAPA 2: GATEWAY & WEBSOCKET"]
-        GW["API Gateway#10;Spring Cloud Gateway#10;:8080"]:::gateway
-        WS["WebSocket Server#10;Spring WebSocket#10;:8081"]:::gateway
+    %% CAPA 2: GATEWAY
+    subgraph CAPA2["🚪 CAPA 2: GATEWAY"]
+        GW["API Gateway :8080<br/><br/>/api/sessions/*<br/>/api/carts/*<br/>/api/products/*<br/>/api/payments/*<br/>/api/auth/* ✨"]:::gateway
     end
     
     %% CAPA 3: MICROSERVICIOS
-    subgraph CAPA3["⚙️ CAPA 3: MICROSERVICIOS"]
-        AUTH["Auth Service#10;Spring Boot :8082#10;JWT + BCrypt"]:::microservice
-        POS["POS Service#10;Spring Boot :8083#10;Transacciones"]:::microservice
-        KIOSK["Kiosk Service#10;Spring Boot :8084#10;Productos"]:::microservice
-        CUSTOMER["Customer Service#10;Spring Boot :8085#10;Clientes + Facial"]:::microservice
-        PAYMENT["Payment Service#10;Spring Boot :8086#10;PSE Integration"]:::microservice
+    subgraph CAPA3["⚙️ CAPA 3: MICROSERVICIOS INTERNOS"]
+        SESSION["Session :8081"]:::microservice
+        CART["Cart :8082"]:::microservice
+        PRODUCT["Product :8083"]:::microservice
+        PAYMENT["Payment :8084"]:::microservice
+        ACCESS["Access :8085"]:::microservice
+        INVENTORY["Inventory :8087"]:::microservice
+        AUTH["✨ Auth :8088<br/><br/>• Login<br/>• PIN gen<br/>• JWT<br/>• Notif ✨"]:::auth
+        WS["WebSocket :8090"]:::microservice
     end
     
     %% CAPA 4: PERSISTENCIA
     subgraph CAPA4["💾 CAPA 4: PERSISTENCIA"]
-        DB_POS[("MySQL POS#10;:3306#10;Transacciones")]:::database
-        DB_KIOSK[("MySQL Kiosk#10;:3307#10;Productos")]:::database
-        DB_CUSTOMER[("MySQL Customer#10;:3308#10;Clientes + Facial")]:::database
-        REDIS[("Redis Cache#10;:6379#10;Sesiones/Tokens")]:::cache
+        POSTGRES[("PostgreSQL :5432<br/><br/>• sessions<br/>• carts<br/>• products<br/>• payments<br/>• access<br/>• inventory<br/>• auth ✨")]:::database
+        REDIS[("Redis :6379<br/><br/>PIN Storage<br/>TTL: 8h")]:::redis
+        RABBIT["RabbitMQ<br/>:5672 / :15672"]:::broker
     end
     
-    %% CONEXIONES - Sistemas Externos
-    THIRD -->|HTTP POST| EXT
-    
-    %% CONEXIONES - API Externa → Gateway
-    EXT -->|REST API| GW
-    
-    %% CONEXIONES - Frontend
-    PWA -->|REST API| GW
-    PWA -.->|WebSocket| WS
-    
-    %% CONEXIONES - Gateway → Microservicios
-    GW -->|Auth| AUTH
-    GW -->|POS| POS
-    GW -->|Kiosk| KIOSK
-    GW -->|Customer| CUSTOMER
-    GW -->|Payment| PAYMENT
-    
-    %% CONEXIONES - WebSocket
-    WS -.->|Real-time| POS
-    WS -.->|Cart Sync| KIOSK
-    
-    %% CONEXIONES - Microservicios entre sí
-    POS -->|Customer Info| CUSTOMER
-    POS -->|Payment| PAYMENT
-    KIOSK -->|Prices| POS
-    CUSTOMER -->|Auth| AUTH
-    
-    %% CONEXIONES - Microservicios → Bases de Datos
-    AUTH -->|Users/Tokens| REDIS
-    POS -->|Transactions| DB_POS
-    KIOSK -->|Products| DB_KIOSK
-    CUSTOMER -->|Customers| DB_CUSTOMER
-    
-    %% CONEXIONES - Cache
-    AUTH -.->|Session| REDIS
-    CUSTOMER -.->|Facial Cache| REDIS
-    
-    %% LEYENDA VISUAL
-    subgraph LEYENDA["📋 LEYENDA"]
-        L1["API Externa"]:::external
-        L2["Frontend React"]:::frontend
-        L3["Gateway/WebSocket"]:::gateway
-        L4["Microservicios"]:::microservice
-        L5["Bases de Datos"]:::database
-        L6["Cache Redis"]:::cache
+    %% CAPA 5: INTEGRACIONES SALIENTES
+    subgraph CAPA5["📤 CAPA 5: INTEGRACIONES SALIENTES"]
+        CENTRAL["Sistema Central<br/>(Validación usuarios)"]:::outgoing
+        TWILIO["Twilio WhatsApp"]:::outgoing
+        SENDGRID["SendGrid Email"]:::outgoing
+        PSE["PSE Pagos"]:::outgoing
     end
+    
+    %% CONEXIONES CAPA 0
+    CONCENTRADOR ==>|"Cliente + Productos"| EXTAPI
+    EXTAPI -->|"Crear sesión"| SESSION
+    EXTAPI -->|"Consultar precios"| PRODUCT
+    EXTAPI -->|"Añadir items"| CART
+    
+    %% CONEXIONES FRONTEND
+    PWA -->|"REST API"| GW
+    PWA -.->|"WebSocket"| WS
+    
+    %% GATEWAY → MICROSERVICIOS
+    GW -->|"/api/sessions/*"| SESSION
+    GW -->|"/api/carts/*"| CART
+    GW -->|"/api/products/*"| PRODUCT
+    GW -->|"/api/payments/*"| PAYMENT
+    GW -->|"/api/access/*"| ACCESS
+    GW -->|"/api/auth/*"| AUTH
+    
+    %% AUTH → CAPA 5 (SALIENTES)
+    AUTH -->|"Validar"| CENTRAL
+    AUTH -->|"WhatsApp PIN"| TWILIO
+    AUTH -->|"Email PIN"| SENDGRID
+    
+    %% PAYMENT → CAPA 5
+    PAYMENT -->|"Procesar pago"| PSE
+    
+    %% WEBSOCKET
+    WS -.->|"Events"| SESSION
+    WS -.->|"Updates"| CART
+    WS -.->|"Status"| PAYMENT
+    
+    %% INTER-MICROSERVICES
+    CART -->|"Session info"| SESSION
+    CART -->|"Product details"| PRODUCT
+    PAYMENT -->|"Cart total"| CART
+    PAYMENT -->|"Session data"| SESSION
+    INVENTORY -->|"Update stock"| PRODUCT
+    
+    %% PERSISTENCIA
+    SESSION -->|"sessions"| POSTGRES
+    CART -->|"carts"| POSTGRES
+    PRODUCT -->|"products"| POSTGRES
+    PAYMENT -->|"payments"| POSTGRES
+    ACCESS -->|"access"| POSTGRES
+    INVENTORY -->|"inventory"| POSTGRES
+    AUTH -->|"auth"| POSTGRES
+    AUTH -->|"PIN hash"| REDIS
+    
+    %% EVENT BUS
+    SESSION -.->|"Publish"| RABBIT
+    CART -.->|"Publish"| RABBIT
+    PAYMENT -.->|"Publish"| RABBIT
+    AUTH -.->|"Publish"| RABBIT
+    RABBIT -.->|"Consume"| WS
+    RABBIT -.->|"Consume"| INVENTORY
 ```
-
-## Descripción de Capas
-
-### 🌐 Capa 0: API Externa
-**Propósito**: Recibir información de sistemas de terceros (IA, cámaras, otros sistemas) sobre clientes y compras.
-
-- **External Customer API** (Puerto 9000)
-  - `POST /api/external/customer` - Recibe información de clientes identificados
-  - `POST /api/external/purchase` - Recibe información de compras detectadas
-  - Manejo temporal de archivos multimedia
-  - Integración con el API Gateway para enrutamiento interno
-
-### 💻 Capa 1: Frontend
-**Propósito**: Interfaz de usuario para operadores del POS.
-
-- **React PWA** (Puerto 5173)
-  - TypeScript + Vite
-  - Zustand para estado global
-  - Soporte offline (PWA)
-  - Diseño responsivo para tablets Android
-
-### 🚪 Capa 2: Gateway & WebSocket
-**Propósito**: Punto de entrada unificado y comunicación en tiempo real.
-
-- **API Gateway** (Puerto 8080)
-  - Enrutamiento centralizado
-  - Balanceo de carga
-  - Autenticación/Autorización
-  
-- **WebSocket Server** (Puerto 8081)
-  - Actualizaciones en tiempo real
-  - Sincronización de carritos
-  - Notificaciones push
-
-### ⚙️ Capa 3: Microservicios
-**Propósito**: Lógica de negocio separada por dominio.
-
-- **Auth Service** (Puerto 8082) - Autenticación JWT + BCrypt
-- **POS Service** (Puerto 8083) - Gestión de transacciones
-- **Kiosk Service** (Puerto 8084) - Catálogo de productos
-- **Customer Service** (Puerto 8085) - Clientes + Reconocimiento facial
-- **Payment Service** (Puerto 8086) - Integración con PSE
-
-### 💾 Capa 4: Persistencia
-**Propósito**: Almacenamiento de datos persistente y caché.
-
-- **MySQL Databases** (Puertos 3306-3308) - Una base de datos por dominio
-- **Redis Cache** (Puerto 6379) - Sesiones, tokens y caché de reconocimiento facial
-
-## Características Clave
-
-### 🔒 Seguridad
-- JWT para autenticación
-- BCrypt para passwords
-- Tokens en Redis con TTL
-- Validación en API Gateway
-
-### 🔄 Escalabilidad
-- Arquitectura de microservicios
-- Base de datos por servicio
-- Cache distribuido
-- WebSocket para real-time
-
-### 📱 Conectividad
-- **API Externa**: Sistemas terceros → Alwon
-- **REST API**: Frontend → Backend
-- **WebSocket**: Comunicación bidireccional en tiempo real
-- **Inter-service**: Comunicación entre microservicios
-
-### 🎯 Flujo de Datos Principal
-
-1. **Sistema Externo** detecta cliente y productos
-2. **External API** recibe datos vía POST
-3. **API Gateway** enruta a servicios correspondientes
-4. **Customer Service** procesa reconocimiento facial
-5. **Kiosk Service** gestiona productos del carrito
-6. **WebSocket** sincroniza con el frontend en tiempo real
-7. **POS Service** procesa la transacción
-8. **Payment Service** ejecuta el pago PSE
-
-## Leyenda de Colores
-
-- 🟣 **Violeta** - API Externa (Sistemas Terceros)
-- 🟢 **Verde** - Frontend (React PWA)
-- 🔵 **Azul** - Gateway & WebSocket
-- 🟡 **Amarillo** - Microservicios
-- 🟨 **Amarillo Claro** - Bases de Datos
-- 🔴 **Rojo** - Cache (Redis)
-
-## Tipos de Conexiones
-
-- **Línea Sólida** (→) - Comunicación REST/HTTP
-- **Línea Punteada** (-..->) - Comunicación WebSocket o Cache
 
 ---
 
-**Versión**: 2.0 - Con API Externa  
-**Fecha**: Diciembre 2025  
-**Proyecto**: Alwon POS
+## 📊 Estructura de Capas
+
+### 📥 Capa 0: Integraciones Entrantes
+**Sistemas que NOS LLAMAN**
+- Concentrador IA → External API :9000
+
+### 💻 Capa 1-4: Sistema Core
+- **Capa 1:** Frontend React PWA
+- **Capa 2:** API Gateway  
+- **Capa 3:** Microservicios (Session, Cart, Product, Payment, Auth, etc.)
+- **Capa 4:** Persistencia (PostgreSQL, Redis, RabbitMQ)
+
+### 📤 Capa 5: Integraciones Salientes
+**Sistemas que NOSOTROS LLAMAMOS**
+- Sistema Central - Validación de operadores
+- Twilio - WhatsApp (PIN)
+- SendGrid - Email (PIN)
+- PSE - Pagos
+
+---
+
+## ✨ Auth Service (Puerto 8088)
+
+**Responsabilidades:**
+- Login con usuario/contraseña
+- Generación de PIN temporal (6 dígitos)
+- Envío directo a Twilio (WhatsApp)
+- Envío directo a SendGrid (Email)
+- Almacenamiento en Redis (hash BCrypt, TTL 8h)
+- JWT tokens
+- Audit log
+
+**Endpoints:**
+- `POST /auth/login`
+- `POST /auth/validate-pin`
+- `POST /auth/logout`
+- `GET /auth/session`
+
+---
+
+## � Decisiones de Arquitectura
+
+### ❌ Eliminado:
+- **Notification Service** (Puerto 8089) → Simplicidad
+
+### ✅ Auth Service ahora:
+- Llama **directamente** a Twilio WhatsApp API
+- Llama **directamente** a SendGrid Email API
+- Reduce latencia y complejidad
+
+### 🏗️ Separación de Capas:
+- **Capa 0:** Solo ENTRANTES (quién nos llama)
+- **Capa 5:** Solo SALIENTES (a quién llamamos)
+- Claridad en flujo de datos
+
+---
+
+**Actualizado:** 25 Diciembre 2025  
+**Motor:** Mermaid v9+
