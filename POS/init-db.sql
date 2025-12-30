@@ -109,18 +109,18 @@ CREATE INDEX idx_products_sku ON products.products(sku);
 CREATE INDEX idx_products_category ON products.products(category);
 CREATE INDEX idx_products_active ON products.products(active);
 
--- Insert sample products
+-- Insert sample products - Canasta Familiar Colombiana
 INSERT INTO products.products (sku, name, description, category, price, barcode, active) VALUES
-('PROD-001', 'Coca Cola 350ml', 'Bebida carbonatada sabor cola', 'BEBIDAS', 2000, '7891234567890', true),
-('PROD-002', 'Agua Mineral 500ml', 'Agua mineral natural', 'BEBIDAS', 1500, '7891234567891', true),
-('PROD-003', 'Pan Integral 500g', 'Pan integral de trigo', 'PANADERIA', 3500, '7891234567892', true),
-('PROD-004', 'Leche Entera 1L', 'Leche ultra pasteurizada', 'LACTEOS', 4200, '7891234567893', true),
-('PROD-005', 'Yogurt Natural 200g', 'Yogurt natural sin azúcar', 'LACTEOS', 2800, '7891234567894', true),
-('PROD-006', 'Papas Fritas 150g', 'Papas fritas sabor natural', 'SNACKS', 3200, '7891234567895', true),
-('PROD-007', 'Chocolate Bar 50g', 'Chocolate con leche', 'DULCES', 2500, '7891234567896', true),
-('PROD-008', 'Café Instantáneo 100g', 'Café soluble', 'BEBIDAS', 8500, '7891234567897', true),
-('PROD-009', 'Galletas Saladas 200g', 'Galletas crackers', 'SNACKS', 3800, '7891234567898', true),
-('PROD-010', 'Jugo Naranja 1L', 'Jugo natural de naranja', 'BEBIDAS', 5500, '7891234567899', true);
+('PROD-001', 'Huevos AA x12', 'Huevos frescos tamaño AA', 'LACTEOS', 8500, '7701234567890', true),
+('PROD-002', 'Coca-Cola 400ml', 'Bebida carbonatada sabor cola', 'BEBIDAS', 2500, '7702345678901', true),
+('PROD-003', 'Pan Tajado Bimbo', 'Pan tajado para sandwich', 'PANADERIA', 4200, '7703456789012', true),
+('PROD-004', 'Leche Alpina 1L', 'Leche entera ultra pasteurizada', 'LACTEOS', 3800, '7704567890123', true),
+('PROD-005', 'Arroz Diana 500g', 'Arroz blanco de primera calidad', 'GRANOS', 2100, '7705678901234', true),
+('PROD-006', 'Aceite Girasol 1L', 'Aceite vegetal de girasol', 'ACEITES', 7500, '7706789012345', true),
+('PROD-007', 'Azúcar Morena 500g', 'Azúcar morena natural', 'GRANOS', 2800, '7707890123456', true),
+('PROD-008', 'Sal de Mesa 500g', 'Sal refinada yodada', 'CONDIMENTOS', 1500, '7708901234567', true),
+('PROD-009', 'Café Colombiano 250g', 'Café molido 100% colombiano', 'BEBIDAS', 9500, '7709012345678', true),
+('PROD-010', 'Pasta Espagueti 500g', 'Pasta de trigo espagueti', 'GRANOS', 3500, '7700123456789', true);
 
 -- ============================================
 -- PAYMENT SERVICE (Port 8084)
