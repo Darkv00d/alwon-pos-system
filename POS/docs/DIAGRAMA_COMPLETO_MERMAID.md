@@ -29,7 +29,8 @@ graph TB
     %% FASE 4: POS RECIBE DATOS
     subgraph FASE4["🔵 FASE 4: POS EN TIEMPO REAL"]
         POSRECIBE["<b>POS (Tablet Android)</b><br/><br/>Recibe en tiempo real:<br/>✓ Clientes activos<br/>✓ Fotos clientes<br/>✓ Artículos por cliente<br/>✓ Datos biométricos"]
-        POSMUESTRA["<b>Vista POS:</b><br/><br/>Lista de clientes activos:<br/>[📷] Juan Pérez - 3 items<br/>[📷] María López - 5 items<br/>[📷] Carlos Ruiz - 2 items"]
+        POSMUESTRA["<b>Vista POS Mejorada:</b><br/><br/>🟢 Juan Pérez - Torre 3, Apto 501<br/>   3 items - $25,900<br/><br/>🟡 PIN-7456<br/>   Torre 2, Apto 305<br/>   5 items - $42,300<br/><br/>🔴 No ID - [🥚🥤🍞] +2<br/>   2 items - $8,500"]
+        OPRAUTH["<b>Operador Autenticado</b><br/><br/>[💰 Cierre Caja] 👤 Admin"]
     end
     
     %% FASE 5: CHECKOUT
@@ -37,7 +38,7 @@ graph TB
         ACERCA["<b>Cliente se acerca</b><br/>al POS a pagar"]
         SELECCIONA["<b>1. Operador SELECCIONA</b><br/>cliente de la lista"]
         CONFIRMA["<b>2. Operador CONFIRMA</b><br/>identidad del cliente<br/>(compara foto con persona)"]
-        CARRITO["<b>3. POS MUESTRA CARRITO</b><br/><br/>Todos los artículos:<br/>• Coca Cola x2 - $4,000<br/>• Pan integral - $3,500<br/>• Leche - $5,200<br/><br/>Total: $12,700"]
+        CARRITO["<b>3. POS MUESTRA CARRITO</b><br/><br/>Juan Pérez - Torre 3, Apto 501<br/><br/>🥚 Huevos x12: $8,500 (x2)<br/>🥤 Coca-Cola 400ml: $2,500 (x3)<br/>🍞 Pan Tajado: $4,200 (x1)<br/><br/>Total: $28,700<br/><br/>[🔄 Suspender] [❌ Cancelar]<br/><br/>[→ CONTINUAR AL PAGO]"]
     end
     
     %% FASE 6: AJUSTE MANUAL
@@ -71,6 +72,7 @@ graph TB
     %% FASE 4
     AI -->|Webhook/API| POSRECIBE
     POSRECIBE --> POSMUESTRA
+    POSMUESTRA -..->|Click Operador| OPRAUTH
     
     %% FASE 5
     TIENDA --> ACERCA
@@ -101,6 +103,7 @@ graph TB
     
     style POSRECIBE fill:#f8cecc,stroke:#b85450,stroke-width:2px,color:#000
     style POSMUESTRA fill:#fff2cc,stroke:#d6b656,stroke-width:2px,color:#000
+    style OPRAUTH fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#000
     
     style SELECCIONA fill:#ffe6cc,stroke:#d79b00,stroke-width:2px,color:#000
     style CONFIRMA fill:#ffe6cc,stroke:#d79b00,stroke-width:2px,color:#000
